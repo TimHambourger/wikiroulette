@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WikiClient</title>
+
+    <!-- Bootstrap -->
+    <link href="lib/bootstrap-3.1.1-dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="controls-div">
+      <button class="btn" onclick="doButtonClick()">
+	Hit me
+      </button>
+    </div>
+    <div id="extracts-div"></div>
+    <script id="extracts-template" type="text/x-handlebars-template">
+      {{#show params}}
+        <h2><a href="{{url}}">{{title}}</a></h2>
+	<p>{{{extract}}}</p>
+      {{/show}}
+    </script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="lib/jquery-1.11.0.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="lib/bootstrap-3.1.1-dist/js/bootstrap.min.js"></script>
+    <script src="lib/moment.min.js"></script>
+    <script src="lib/handlebars-v1.3.0.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>
