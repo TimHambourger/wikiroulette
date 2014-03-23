@@ -81,8 +81,6 @@ function requestArticles(n, language, generator) {
 	data.gsrlimit = n;
 	data.gsroffset = searchParams.searchOffset;
     }
-    console.log(DOM.searchInput.val());
-    console.log(JSON.stringify(data));
     var queries = [];
     for (var key in data) {
 	if (data.hasOwnProperty(key)) {
@@ -91,7 +89,7 @@ function requestArticles(n, language, generator) {
     }
     var queryString = queries.join("&");
     var url = [urlBase, queryString].join("");
-    console.log("url: "+url);
+    console.info("index.js request url: "+url);
     var timeoutId = setTimeout(httpTimeout, 2000);
     showLoading();
     $.getJSON(url, curryJSONPSuccess(language, timeoutId)
@@ -159,10 +157,10 @@ Handlebars.registerHelper("show", function(params, options) {
 		["http://", language, ".", WIKIPEDIA_BASE,
 		       encodeURIComponent(title)].join("");
 	    var content = extract.extract;
-	    console.log("pageid: "+extract.pageid);
-	    console.log(content);
-	    //get first paragraph only
-	    var match = content.match(/^[^]*?<p>[^]*?<\/p>/);
+	    console.info("index.js extract content:");
+	    console.info(content.substr(0, 30)+"...");
+	    //get first non-empty paragraph only
+	    var match = content.match(/^[^]*?<p>[^]*?\S+?[^]*?<\/p>/);
 	    var firstPara;
 	    if (match) {
 		firstPara = match[0];
@@ -202,7 +200,6 @@ function hideLoading() {
 }
 
 function showAlert() {
-    console.log("showAlert");
     if (DOM.alert) DOM.alert.css("display", "block");
     //if (DOM.alert) DOM.alert.alert();
 }
@@ -296,7 +293,6 @@ function selectSearchBy(target) {
 	hideSearchInput();
     }
     searchParams.generator = generator;
-    console.log("set generator to "+searchParams.generator);
     return value;
 }
 
