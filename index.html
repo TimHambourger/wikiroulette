@@ -8,18 +8,101 @@
 
     <!-- Bootstrap -->
     <link href="lib/bootstrap-3.1.1-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/index.css" rel="stylesheet">
   </head>
   <body>
-    <div id="controls-div">
-      <button class="btn" onclick="doButtonClick()">
-	Hit me
-      </button>
-    </div>
+    <div id="loading"></div>
+    <h1> WikiRoulette <br /> <small> View Random Wikipedia Articles </small> </h1>
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="container-fluid">
+	<div class="navbar-header">
+	  <button type="button" class="navbar-toggle pull-left" data-toggle="collapse"
+		  data-target="#search-options">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+	  </button>
+	  <button type="submit" class="btn btn-default submit-btn
+				       submit-btn-small pull-right">
+	    Hit me
+	  </button>
+	</div>
+	<div class="collapse navbar-collapse" id="search-options">
+	  <ul class="nav navbar-nav">
+	    <li class="dropdown">
+	      <a href="#" id="language-btn"
+		 class="dropdown-toggle" data-toggle="dropdown">
+		<span id="language-btn-text"> Language </span>
+		<b class="caret"></b>
+	      </a>
+	      <ul class="dropdown-menu menu-language" role="menu">
+		<li><a href="#" data-key="English" class="default-selection">
+		    English
+		</a></li>
+		<li><a href="#" data-key="Spanish"> Español </a></li>
+		<li><a href="#" data-key="French"> Français </a></li>
+		<li><a href="#" data-key="German"> Deutsch </a></li>
+		<li><a href="#" data-key="Italian"> Italiano </a></li>
+	      </ul>
+	    </li>
+	    <li class="dropdown">
+	      <a href="#" id="articles-btn"
+		 class="dropdown-toggle" data-toggle="dropdown">
+		<span id="articles-btn-text"> Articles </span>
+		<b class="caret"></b>
+	      </a>
+	      <ul class="dropdown-menu menu-articles" role="menu">
+		<li><a href="#" class="default-selection">1</a></li>
+		<li><a href="#">2</a></li>
+		<li><a href="#">3</a></li>
+		<li><a href="#">4</a></li>
+		<li><a href="#">5</a></li>
+		<li><a href="#">6</a></li>
+		<li><a href="#">7</a></li>
+		<li><a href="#">8</a></li>
+		<li><a href="#">9</a></li>
+		<li><a href="#">10</a></li>
+	      </ul>
+	    </li>
+	    <li>
+	    <li class="dropdown">
+	      <a href="#" id="searchby-btn"
+		 class="dropdown-toggle" data-toggle="dropdown">
+		<span id="searchby-btn-text"> Search by </span>
+		<b class="caret"></b>
+	      </a>
+	      <ul class="dropdown-menu menu-searchby" role="menu">
+		<li><a href="#" data-key="random" class="default-selection">
+		    Random
+		</a></li>
+		<li><a href="#" data-key="search">
+		    Content
+		</a></li>
+		<li><a href="#" data-key="category">
+		    Category
+		</a></li>
+	      </ul>
+	    </li>
+	    </ul>
+	    <form class="navbar-form navbar-left" id="search-form" role="search">
+	      <div class="form-group">
+		<input type="text" id="search-input"
+		       class="form-control" placeholder="Search">
+	      </div>	
+	    </form>
+	    <button type="submit" class="btn btn-default navbar-right
+					 submit-btn submit-btn-med">
+	      Hit me
+	    </button>
+	</div>
+      </div>
+    </nav>
     <div id="extracts-div"></div>
     <script id="extracts-template" type="text/x-handlebars-template">
       {{#show params}}
         <h2><a href="{{url}}">{{title}}</a></h2>
-	<p>{{{extract}}}</p>
+	{{{extract}}}
       {{/show}}
     </script>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

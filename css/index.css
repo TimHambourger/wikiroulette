@@ -1,0 +1,105 @@
+body {
+    max-width: 700px;
+    margin: 10px auto;
+}
+
+@media (max-width: 768px) {
+    .navbar-toggle {
+	margin-left: 20px;
+    }
+
+    .submit-btn-med {
+	display: none;
+    }
+
+    .submit-btn-small {
+	margin-right: 20px;
+    }
+
+    .navbar-collapse {
+	max-height: 1000px;
+    }
+}
+
+@media (min-width: 768px) {
+    .dropdown {
+	width: 120px;
+    }
+
+    .submit-btn-small {
+	display: none;
+    }
+
+    .submit-btn-med {
+	float: right;
+	margin-right: 20px;
+    }
+
+    .navbar-collapse {
+	padding-left: 0;
+	padding-right: 0;
+    }
+}
+
+h1 {
+    margin-left: 20px;
+}
+
+.menu-articles {
+    min-width: 0;
+}
+
+.search-form {
+    display: none;
+}
+
+#extracts-div {
+    margin-top: 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.submit-btn {
+    margin-top: 10px;
+}
+
+#loading {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    margin: auto;
+    width: 100px; 
+    height: 100px;    
+    background-image: url('../images/spinner.png');
+    background-size: 100%;
+    z-index: 100;
+    -webkit-background-size: 100%;
+    -moz-background-size: 100%;
+    -o-background-size: 100%;
+    -webkit-animation-name: spin;
+    -webkit-animation-duration: 2000ms;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: spin;
+    -moz-animation-duration: 2000ms;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    -ms-animation-name: spin;
+    -ms-animation-duration: 2000ms;
+    -ms-animation-iteration-count: infinite;
+    -ms-animation-timing-function: linear;
+    -o-transition: rotate(360deg);
+}
+
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
