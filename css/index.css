@@ -63,6 +63,10 @@ h1 {
     margin-top: 10px;
 }
 
+#alert {
+    display: none;
+}
+
 #loading {
     display: none;
     position: fixed;

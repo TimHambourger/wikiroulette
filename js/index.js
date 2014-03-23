@@ -25,13 +25,17 @@ var GENERATORS = {
 var DOM = {
     loading: null,
     searchInput: null,
-    searchForm: null
+    searchForm: null,
+    extractsDiv: null,
+    alert: null
 };
 
 var searchParams = {
     articles: null,
     language: null,
-    generator: null
+    generator: null,
+    searchOffset: 0,
+    searchTerm: ""
 };
 
 //mapping to jQuery objects
@@ -50,9 +54,14 @@ var CHARS_TO_SHOW = 200;
  * @param language string code for wikipedia subdomain. 'en' for English.
  */
 function requestArticles(n, language, generator) {
-    //if don't have a search term, just do random search
     if (!DOM.searchInput || !DOM.searchInput.val())
+	//if don't have a search term, just do random search
 	generator = GENERATORS.random;
+    else if (DOM.searchInput.val() !== searchParams.searchTerm) {
+	//if search term has changed, clear search offset
+	searchParams.searchOffset = 0;
+	searchParams.searchTerm = DOM.searchInput.val();
+    }
     var urlBase = "http://"+language+"."+API_BASE;
     var data = {
 	action: "query",
@@ -70,19 +79,18 @@ function requestArticles(n, language, generator) {
 	data.gsrsearch = DOM.searchInput.val();
 	data.gsrnamespace = 0;
 	data.gsrlimit = n;
+	data.gsroffset = searchParams.searchOffset;
     }
     console.log(DOM.searchInput.val());
     console.log(JSON.stringify(data));
-    var urlBits = [urlBase];
+    var queries = [];
     for (var key in data) {
 	if (data.hasOwnProperty(key)) {
-	    urlBits.push(key+"="+data[key]+"&");
+	    queries.push(key+"="+data[key]);
 	}
     }
-    var url = urlBits.join("");
-    //var queryString = ["action=query&prop=extracts&format=json&exintro=&generator=random&grnnamespace=0&callback=?&", "exlimit=", n, "&grnlimit=", n].join("");
-
-//http://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exlimit=1&exintro=&generator=search&gsrsearch=cross&gsrnamespace=0&gsrlimit=1
+    var queryString = queries.join("&");
+    var url = [urlBase, queryString].join("");
     console.log("url: "+url);
     var timeoutId = setTimeout(httpTimeout, 2000);
     showLoading();
@@ -92,7 +100,7 @@ function requestArticles(n, language, generator) {
 
 function httpTimeout() {
     hideLoading();
-    alert("Request timeout. Please check your internet connection and try again.");
+    showAlert();
     console.error("index.js ajax timeout");
 }
 
@@ -100,8 +108,31 @@ function curryJSONPSuccess(language, timeoutId) {
     return function(data) {
 	clearTimeout(timeoutId);
 	try {
-	    console.info("index.js "+moment().format("HH:mm:ss")+" JSONP success");
+	    console.info("index.js "+moment().format("HH:mm:ss")
+			 +" JSONP success");
+	    var queryContinue = data["query-continue"];
+	    //if doing generator search, update searchOffset for 
+	    //next search
+	    if (queryContinue && queryContinue.search) {
+		searchParams.searchOffset =
+		    queryContinue.search.gsroffset;
+	    }
+	    var searchInfo;
+	    if (data.query) searchInfo = data.query.searchinfo;
+	    if (searchInfo) {
+		var totalHits = searchInfo.totalhits;
+		if (totalHits === 0) {
+		    var noResults =
+			"<p><i>Sorry, didn't find any matching articles.</i></p>";
+		    if (DOM.extractsDiv) {
+			DOM.extractsDiv.html(noResults);
+		    }
+		    hideLoading();
+		    return;
+		}
+	    }
 	    var extracts = data.query.pages;
+	    hideAlert();
 	    addExtracts(extracts, language);
 	    hideLoading();
 	} catch (e) {
@@ -112,7 +143,7 @@ function curryJSONPSuccess(language, timeoutId) {
 }
 
 function clearExtracts() {
-    $("#extracts-div").html("");
+   if (DOM.extractsDiv) DOM.extractsDiv.html("");
 }
 
 //do Handlebars stuff
@@ -128,8 +159,10 @@ Handlebars.registerHelper("show", function(params, options) {
 		["http://", language, ".", WIKIPEDIA_BASE,
 		       encodeURIComponent(title)].join("");
 	    var content = extract.extract;
+	    console.log("pageid: "+extract.pageid);
+	    console.log(content);
 	    //get first paragraph only
-	    var match = content.match(/^.*?<p>.*?<\/p>/);
+	    var match = content.match(/^[^]*?<p>[^]*?<\/p>/);
 	    var firstPara;
 	    if (match) {
 		firstPara = match[0];
@@ -146,8 +179,8 @@ Handlebars.registerHelper("show", function(params, options) {
     return out.join("");
 });
 
-var extractsTemplateSource = $("#extracts-template").html();
-var extractsTemplate = Handlebars.compile(extractsTemplateSource);
+//will store Handlebars template for extracts here
+var extractsTemplate;
 
 function addExtracts(extracts, language) {
     var context = {
@@ -157,7 +190,7 @@ function addExtracts(extracts, language) {
 	}
     };
     var compiledExtracts = extractsTemplate(context);
-    $("#extracts-div").html(compiledExtracts);
+    if (DOM.extractsDiv) DOM.extractsDiv.html(compiledExtracts);
 }
 
 function showLoading() {
@@ -166,6 +199,17 @@ function showLoading() {
 
 function hideLoading() {
     if (DOM.loading) DOM.loading.css("display", "none");
+}
+
+function showAlert() {
+    console.log("showAlert");
+    if (DOM.alert) DOM.alert.css("display", "block");
+    //if (DOM.alert) DOM.alert.alert();
+}
+
+function hideAlert() {
+    if (DOM.alert) DOM.alert.css("display", "none");
+    //if (DOM.alert) DOM.alert.alert("close");
 }
 
 function showSearchInput() {
@@ -183,8 +227,8 @@ function hideSearchInput() {
 	
 
 function doSearch() {
-    requestArticles(searchParams.articles,
-		    searchParams.language, searchParams.generator);
+    requestArticles(searchParams.articles, searchParams.language,
+		    searchParams.generator);
 }
 
 $(".submit-btn").on("click", doSearch);
@@ -268,10 +312,33 @@ function changeSelection(menuType, target) {
     target.addClass("bg-primary");
 }
 
+$(document).keydown(function(e) {
+    var keyCode = e.keyCode || e.which;
+    if (keyCode === 13) {
+	e.preventDefault();
+	doSearch();
+    }
+});
+    
 $(document).ready(function() {
     DOM.loading = $("#loading");
     DOM.searchInput = $("#search-input");
     DOM.searchForm = $("#search-form");
+    DOM.extractsDiv = $("#extracts-div");
+    DOM.alert = $("#alert");
+    $("#alert .close").on("click", hideAlert);
+    $("#language-btn").on("click", function() {
+	$("#language-btn-text").html("Language");
+    });
+    $("#articles-btn").on("click", function() {
+	$("#articles-btn-text").html("Articles");
+    });
+    $("#searchby-btn").on("click", function() {
+	$("#searchby-btn-text").html("Search by");
+    });
+    var extractsTemplateSource = $("#extracts-template").html();
+    extractsTemplate = Handlebars.compile(extractsTemplateSource);
+    //get defaults from html
     var defaultLanguageSelection = $(".menu-language a.default-selection");
     var defaultArticlesSelection = $(".menu-articles a.default-selection");
     var defaultSearchbySelection = $(".menu-searchby a.default-selection");

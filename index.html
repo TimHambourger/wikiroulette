@@ -79,9 +79,9 @@
 		<li><a href="#" data-key="search">
 		    Content
 		</a></li>
-		<li><a href="#" data-key="category">
+<!--		<li><a href="#" data-key="category">
 		    Category
-		</a></li>
+		</a></li> -->
 	      </ul>
 	    </li>
 	    </ul>
@@ -98,6 +98,14 @@
 	</div>
       </div>
     </nav>
+    <div id="alert" class="alert alert-warning alert-dismissable">
+      <button type="button" class="close"
+	      aria-hidden="true">
+	&times;
+      </button>
+      <p><strong> Request timeout. </strong></p>
+      <p> Please check your internet connection and try again.</p>
+    </div>
     <div id="extracts-div"></div>
     <script id="extracts-template" type="text/x-handlebars-template">
       {{#show params}}
