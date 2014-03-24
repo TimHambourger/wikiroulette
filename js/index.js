@@ -15,10 +15,10 @@ var LANGUAGES = {
     Italian: 'it'
 };
 
+//possible values for generator field in request query string
 var GENERATORS = {
     random: "random",
-    search: "search",
-    category: "category"
+    search: "search"
 };
 
 //place to store jQuery objects
@@ -30,23 +30,22 @@ var DOM = {
     alert: null
 };
 
+//parameters for perming search
 var searchParams = {
     articles: null,
     language: null,
     generator: null,
+    //wikipedia API uses this offset to continue searching on same search term
     searchOffset: 0,
     searchTerm: ""
 };
 
-//mapping to jQuery objects
+//maps to jQuery objects for current menu selections
 var selectedItems = {
     articles: null,
     language: null,
     searchby: null
 };
-
-//number of characters to show in an article by default
-var CHARS_TO_SHOW = 200;
 
 /* request n random articles from Wikipedia's API
  * 
@@ -92,8 +91,7 @@ function requestArticles(n, language, generator) {
     console.info("index.js request url: "+url);
     var timeoutId = setTimeout(httpTimeout, 2000);
     showLoading();
-    $.getJSON(url, curryJSONPSuccess(language, timeoutId)
-    );
+    $.getJSON(url, curryJSONPSuccess(language, timeoutId));
 }
 
 function httpTimeout() {
@@ -109,7 +107,7 @@ function curryJSONPSuccess(language, timeoutId) {
 	    console.info("index.js "+moment().format("HH:mm:ss")
 			 +" JSONP success");
 	    var queryContinue = data["query-continue"];
-	    //if doing generator search, update searchOffset for 
+	    //if generator is search, update searchOffset for 
 	    //next search
 	    if (queryContinue && queryContinue.search) {
 		searchParams.searchOffset =
@@ -134,17 +132,13 @@ function curryJSONPSuccess(language, timeoutId) {
 	    addExtracts(extracts, language);
 	    hideLoading();
 	} catch (e) {
-	    //if error, processing request, we'll just throw same error alert
+	    //if error processing request, we'll show same error as for timeout
 	    httpTimeout();
 	}
     };
 }
 
-function clearExtracts() {
-   if (DOM.extractsDiv) DOM.extractsDiv.html("");
-}
-
-//do Handlebars stuff
+//Handlebars helper to display extracts
 Handlebars.registerHelper("show", function(params, options) {
     var extracts = params.extracts;
     var language = params.language;
@@ -159,7 +153,7 @@ Handlebars.registerHelper("show", function(params, options) {
 	    var content = extract.extract;
 	    console.info("index.js extract content:");
 	    console.info(content.substr(0, 30)+"...");
-	    //get first non-empty paragraph only
+	    //get everything through first non-empty paragraph
 	    var match = content.match(/^[^]*?<p>[^]*?\S+?[^]*?<\/p>/);
 	    var firstPara;
 	    if (match) {
@@ -201,12 +195,10 @@ function hideLoading() {
 
 function showAlert() {
     if (DOM.alert) DOM.alert.css("display", "block");
-    //if (DOM.alert) DOM.alert.alert();
 }
 
 function hideAlert() {
     if (DOM.alert) DOM.alert.css("display", "none");
-    //if (DOM.alert) DOM.alert.alert("close");
 }
 
 function showSearchInput() {
@@ -227,8 +219,6 @@ function doSearch() {
     requestArticles(searchParams.articles, searchParams.language,
 		    searchParams.generator);
 }
-
-$(".submit-btn").on("click", doSearch);
 
 $(document).on("click", ".menu-language li a", function(e) {
     e.preventDefault();
@@ -287,7 +277,7 @@ function selectSearchBy(target) {
     var key = target.data("key");
     var value = target.html();
     var generator = GENERATORS[key];
-    if (generator === GENERATORS.search || generator === GENERATORS.category) {
+    if (generator === GENERATORS.search) {
 	showSearchInput();
     } else {
 	hideSearchInput();
@@ -317,11 +307,13 @@ $(document).keydown(function(e) {
 });
     
 $(document).ready(function() {
+    //store jQuery objects for later use
     DOM.loading = $("#loading");
     DOM.searchInput = $("#search-input");
     DOM.searchForm = $("#search-form");
     DOM.extractsDiv = $("#extracts-div");
     DOM.alert = $("#alert");
+    //bind event listeners
     $("#alert .close").on("click", hideAlert);
     $("#language-btn").on("click", function() {
 	$("#language-btn-text").html("Language");
@@ -332,15 +324,18 @@ $(document).ready(function() {
     $("#searchby-btn").on("click", function() {
 	$("#searchby-btn-text").html("Search by");
     });
+    $(".submit-btn").on("click", doSearch);
+    //compile Handlebars template
     var extractsTemplateSource = $("#extracts-template").html();
     extractsTemplate = Handlebars.compile(extractsTemplateSource);
-    //get defaults from html
+    //get default search params from html and set correct appearance
     var defaultLanguageSelection = $(".menu-language a.default-selection");
     var defaultArticlesSelection = $(".menu-articles a.default-selection");
     var defaultSearchbySelection = $(".menu-searchby a.default-selection");
     selectLanguage(defaultLanguageSelection);
     selectArticles(defaultArticlesSelection);
     selectSearchBy(defaultSearchbySelection);
+    //populate first extract
     doSearch();
 });
 
