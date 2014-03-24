@@ -19,7 +19,7 @@ WikiRoulette supports random search and search by user-provided search term.
 
 ## Frameworks / Libraries
 
-Bootstrap.js 3.1.1
-jQuery 1.11.0
-Moment.js 2.5.1
-Handlebars.js 1.3.0
+Bootstrap.js 3.1.1  
+jQuery 1.11.0  
+Moment.js 2.5.1  
+Handlebars.js 1.3.0  
