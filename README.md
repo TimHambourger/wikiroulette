@@ -1,6 +1,8 @@
 # WikiRoulette
 
-WikiRoulette is a one-page web application for viewing Wikipedia article extracts.
+WikiRoulette is a one-page web application for viewing Wikipedia article extracts.  
+[View running installation](http://ec2-54-200-1-154.us-west-2.compute.amazonaws.com/wikiroulette/)
+
 
 ## Supported Devices
 
